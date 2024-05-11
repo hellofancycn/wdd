@@ -29,6 +29,14 @@
         <el-input-number v-model="form.oneScore" :precision="1" :step="1"  :min="0.1"
         ></el-input-number>
       </el-form-item>
+      <el-form-item label="封面：" prop="coverPath" required>
+        <el-upload accept=".jpg,.png" name="file" :data="{ folder: 'train/exam/paper' }"
+                   action="/api/upload/folder/file"
+                   :show-file-list="false" :on-progress="uploadProgress" :on-success="uploadImageSuccess"
+                   :on-error="uploadError">
+          <el-image style="width: 350px; height: 200px" :src="form.coverPath" fit="fill"></el-image>
+        </el-upload>
+      </el-form-item>
       <el-form-item :key="index" :label="`标题${index+1}：`" v-for="(titleItem,index) in form.titleItems"
                     class="form-item-content-block">
         <div class="exam-paper-title">
@@ -177,7 +185,8 @@ export default {
         questionItemMess: false,
         suggestTime: null,
         titleItems: [],
-        sumScore: 0
+        sumScore: 0,
+        coverPath: null,
       },
       formLoading: false,
       rules: {
@@ -249,6 +258,22 @@ export default {
     }
   },
   methods: {
+    uploadImageSuccess(re, file) {
+      this.loading.close()
+      this.form.coverPath = re.response.path
+    },
+    uploadProgress() {
+      this.loading = this.$loading({
+        lock: true,
+        text: '文件上传中…',
+        spinner: 'el-icon-loading',
+        background: 'rgba(0, 0, 0, 0.5)'
+      })
+    },
+    uploadError() {
+      this.loading.close()
+      this.$message.error('文件上传失败，请检查文件大小或文件格式')
+    },
     addTitle() {
       this.form.titleItems.push({
         name: '',

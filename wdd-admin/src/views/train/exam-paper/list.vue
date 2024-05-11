@@ -17,7 +17,6 @@
         </router-link>
       </el-form-item>
     </el-form>
-
     <el-table :data="tableData" border fit highlight-current-row style="width: 100%">
       <el-table-column prop="id" label="Id" width="90px"/>
       <el-table-column prop="level" label="试卷分类" width="120px"/>
