@@ -1,6 +1,6 @@
 <template>
   <div class="app-container extract-contain">
-    
+
     <div class="extract-right">
       <el-card header="试卷编辑：">
         <el-form :model="form" ref="form" label-width="100px" v-loading="formLoading" :rules="rules">
@@ -153,6 +153,14 @@
               <el-option v-for="item in credentialList" :key="item.value" :value="item.value"
                 :label="item.name"></el-option>
             </el-select>
+          </el-form-item>
+          <el-form-item label="封面：" prop="coverPath" required>
+            <el-upload accept=".jpg,.png" name="file" :data="{ folder: 'everyExam/everyExam' }"
+                       action="/api/upload/folder/file"
+                       :show-file-list="false" :on-progress="uploadProgress" :on-success="uploadImageSuccess"
+                       :on-error="uploadError">
+              <el-image style="width: 350px; height: 200px" :src="form.coverPath" fit="fill"></el-image>
+            </el-upload>
           </el-form-item>
           <el-form-item v-if="action !== 1">
             <el-button type="primary" @click="submitForm"
@@ -378,7 +386,8 @@ export default {
             difficult: 0
           }
         },
-        sumScore: 0
+        sumScore: 0,
+        coverPath: null,
       },
       formLoading: false,
       rules: {
@@ -673,6 +682,10 @@ export default {
       }).finally(() => {
         this.userPage.listLoading = false
       })
+    },
+    uploadImageSuccess(re, file) {
+      this.loading.close()
+      this.form.coverPath = re.response.path
     },
     uploadProgress() {
       this.loading = this.$loading({

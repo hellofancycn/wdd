@@ -17,7 +17,14 @@
                        :label="item.value"></el-option>
           </el-select>
         </el-form-item>
-
+        <el-form-item label="封面：" prop="coverPath" required>
+          <el-upload accept=".jpg,.png" name="file" :data="{ folder: 'exam/paper/build' }"
+                     action="/api/upload/folder/file"
+                     :show-file-list="false" :on-progress="uploadProgress" :on-success="uploadImageSuccess"
+                     :on-error="uploadError">
+            <el-image style="width: 350px; height: 200px" :src="form.coverPath" fit="fill"></el-image>
+          </el-upload>
+        </el-form-item>
         <el-form-item label="考试报名：" class="tree-select-contain"
                       v-if="form.rangeType !== null && form.rangeType === 1">
           <div class="apply-user">
@@ -316,7 +323,8 @@ export default {
           examPaperApplySelect: null,
           examPaperBuildRandomList: []
         },
-        sumScore: 0
+        sumScore: 0,
+        coverPath: null,
       },
       formLoading: false,
       rules: {
@@ -367,7 +375,7 @@ export default {
       departmentTree: [],
       credentialList: [],
       applyArchiveTree: [],
-      action: 0
+      action: 0,
     }
   },
   computed: {
@@ -575,6 +583,10 @@ export default {
       }).finally(() => {
         this.userPage.listLoading = false
       })
+    },
+    uploadImageSuccess(re, file) {
+      this.loading.close()
+      this.form.coverPath = re.response.path
     },
     uploadProgress() {
       this.loading = this.$loading({

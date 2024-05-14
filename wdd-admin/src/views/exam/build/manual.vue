@@ -1,6 +1,6 @@
 <template>
   <div class="app-container">
-    <el-form :model="form" ref="form" label-width="100px" v-loading="formLoading" :rules="rules">
+    <el-form :model="form" ref="form" label-width="120px" v-loading="formLoading" :rules="rules">
       <el-form-item label="试卷分类：">
         <el-tree-select v-model="form.examPaperArchiveId" :data="examPaperArchiveTree" check-strictly
                         :render-after-expand="true" default-expand-all placeholder="试卷分类"/>
@@ -14,7 +14,14 @@
                      :label="item.value"></el-option>
         </el-select>
       </el-form-item>
-
+      <el-form-item label="封面：" prop="coverPath" required>
+        <el-upload accept=".jpg,.png" name="file" :data="{ folder: 'exam/paper/build' }"
+                   action="/api/upload/folder/file"
+                   :show-file-list="false" :on-progress="uploadProgress" :on-success="uploadImageSuccess"
+                   :on-error="uploadError">
+          <el-image style="width: 350px; height: 200px" :src="form.coverPath" fit="fill"></el-image>
+        </el-upload>
+      </el-form-item>
       <el-form-item label="考试报名：" class="tree-select-contain"
                     v-if="form.rangeType !== null && form.rangeType === 1">
         <div class="apply-user">
@@ -85,7 +92,7 @@
         </el-tooltip>
       </el-form-item>
       <el-form-item label="单题分数：" prop="oneScore" required>
-        <el-input-number v-model="form.oneScore" :precision="1" :step="1"  :min="0.1"
+        <el-input-number v-model="form.oneScore" :precision="1" :step="1" :min="0.1"
         ></el-input-number>
       </el-form-item>
       <el-form-item :key="index" :label="`标题${index+1}：`" v-for="(titleItem,index) in form.titleItems"
@@ -317,7 +324,7 @@ export default {
         passScore: null,
         suggestTime: null,
         titleItems: [],
-        oneScore:null,
+        oneScore: null,
         buildConfig: {
           watch: true,
           cheat: false,
@@ -330,7 +337,8 @@ export default {
           examPaperUserSelectList: [],
           examPaperApplySelect: null
         },
-        sumScore: 0
+        sumScore: 0,
+        coverPath: null,
       },
       formLoading: false,
       rules: {
@@ -603,6 +611,10 @@ export default {
         this.userPage.listLoading = false
       })
     },
+    uploadImageSuccess(re, file) {
+      this.loading.close()
+      this.form.coverPath = re.response.path
+    },
     uploadProgress() {
       this.loading = this.$loading({
         lock: true,
@@ -782,7 +794,7 @@ export default {
       let score = 0
       this.form.titleItems.forEach(ti => {
         ti.questionItems.forEach(q => {
-          q.score =this.form.oneScore
+          q.score = this.form.oneScore
         })
       })
       this.form.titleItems.forEach(ti => {
