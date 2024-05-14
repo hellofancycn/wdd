@@ -16,7 +16,6 @@ export function edit(data: any): any {
       return postWithLoadTip(`/api/dict/type/create`, data)
     }
 }
-
 export function deleteDictApi(data: any): any {
     return post(`/api/dict/type/delete`, data);
 }
