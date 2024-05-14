@@ -1,6 +1,12 @@
 <template>
   <div class="app-container">
-    <el-form :model="form" ref="form" label-width="100px" v-loading="formLoading" :rules="rules">
+    <el-form
+      :model="form"
+      ref="form"
+      label-width="100px"
+      v-loading="formLoading"
+      :rules="rules"
+    >
       <el-form-item label="字典类型：" prop="dictType" required>
         <el-input v-model="form.dictType" />
       </el-form-item>
@@ -19,10 +25,10 @@
 </template>
 
 <script>
-import {edit} from '@/api/dictManagement'
-import useStore from '@/store'
+import { edit, getInfoDictApi } from '@/api/dictManagement';
+import useStore from '@/store';
 
-const {tagsView} = useStore()
+const { tagsView } = useStore();
 
 export default {
   name: 'DictManagementEdit',
@@ -37,35 +43,36 @@ export default {
       formLoading: false,
       rules: {
         dictType: [
-          {required: true, message: '请输入字典类型', trigger: 'blur'}
+          { required: true, message: '请输入字典类型', trigger: 'blur' }
         ],
         dictName: [
-          {required: true, message: '请输入字典名称', trigger: 'blur'}
+          { required: true, message: '请输入字典名称', trigger: 'blur' }
         ]
       }
-    }
+    };
   },
   methods: {
     submitForm() {
-      this.$refs.form.validate((valid) => {
+      this.$refs.form.validate(valid => {
         if (valid) {
-          this.formLoading = true
-          edit(this.form).then(re => {
-            if (re.code === 1) {
-              this.$message.success(re.message)
-              tagsView.delCurrentView(this).then(() => {
-                this.$router.push('/base/dictData/list')
-              })
-            } else {
-              this.$message.error(re.message)
-            }
-          }).finally(() => {
-            this.formLoading = false
-          })
+          this.formLoading = true;
+          edit(this.form)
+            .then(re => {
+              if (re.code === 1) {
+                this.$message.success(re.message);
+                this.$router.go(-1);
+                // tagsView.delCurrentView(this.form).then(() => {});
+              } else {
+                this.$message.error(re.message);
+              }
+            })
+            .finally(() => {
+              this.formLoading = false;
+            });
         } else {
-          return false
+          return false;
         }
-      })
+      });
     },
     resetForm() {
       this.form = {
@@ -73,12 +80,29 @@ export default {
         dictType: '',
         dictName: '',
         remark: ''
-      }
-      this.$refs['form'].resetFields()
+      };
+      this.$refs['form'].resetFields();
+    },
+    getInfo() {
+      this.formLoading = true;
+      getInfoDictApi({ dictId: this.$route.query.dictId })
+        .then(re => {
+          if (re.code === 1) {
+            this.form = re.response;
+          } else {
+            this.$message.error(re.message);
+          }
+        })
+        .finally(() => {
+          this.formLoading = false;
+        });
     }
   },
   mounted() {
-    this.form.dictId = this.$route.query.dictId
+    if (this.$route.query.dictId) {
+      this.form.dictId = this.$route.query.dictId;
+      this.getInfo();
+    }
   }
-}
+};
 </script>
