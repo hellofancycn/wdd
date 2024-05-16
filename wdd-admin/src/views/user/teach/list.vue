@@ -72,6 +72,15 @@
 <script>
 
 import {employeePage, employeeDelete, employeeExport} from '@/api/user'
+import {page,
+  select,
+  edit,
+  deleteTeacherApi,
+  userAnswerPage,
+  answerRead,
+  answerEdit,
+  nextJudge} from '@/api/trainTeacher'
+
 import {tree} from '@/api/department'
 
 export default {
@@ -113,7 +122,7 @@ export default {
       this.search()
     },
     search() {
-      employeePage(this.queryParam).then(data => {
+      page(this.queryParam).then(data => {
         const re = data.response
         this.tableData = re.list
         this.total = re.total

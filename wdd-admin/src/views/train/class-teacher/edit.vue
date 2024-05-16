@@ -1,6 +1,12 @@
 <template>
   <div class="app-container">
-    <el-form :model="form" ref="form" label-width="100px" v-loading="formLoading" :rules="rules">
+    <el-form
+      :model="form"
+      ref="form"
+      label-width="100px"
+      v-loading="formLoading"
+      :rules="rules"
+    >
       <el-form-item label="姓名：" prop="name" required>
         <el-input v-model="form.name" />
       </el-form-item>
@@ -19,10 +25,10 @@
 </template>
 
 <script>
-import {edit} from '@/api/trainTeacher'
-import useStore from '@/store'
+import { edit, getInfo } from '@/api/trainTeacher';
+import useStore from '@/store';
 
-const {tagsView} = useStore()
+const { tagsView } = useStore();
 
 export default {
   name: 'TrainExamPaperEdit',
@@ -37,39 +43,61 @@ export default {
       formLoading: false,
       rules: {
         name: [
-          {required: true, message: '请输入班主任名称', trigger: 'blur'}
+          { required: true, message: '请输入班主任名称', trigger: 'blur' }
         ],
         title: [
-          {required: true, message: '请输入班主任职位', trigger: 'blur'}
+          { required: true, message: '请输入班主任职位', trigger: 'blur' }
         ],
         linkPhone: [
-          {required: true, message: '请输入班主任电话', trigger: 'blur'},
+          { required: true, message: '请输入班主任电话', trigger: 'blur' },
           { pattern: /^1\d{10}$/, message: '电话格式不正确', trigger: 'blur' }
-        ],
+        ]
       }
+    };
+  },
+  created() {
+    const id = this.$route.query.id;
+    if (id) {
+      this.getForm(id);
     }
   },
   methods: {
+    getForm(id) {
+      this.formLoading = true;
+      getInfo({ id })
+        .then(re => {
+          if (re.code === 1) {
+            this.form = re.data;
+          } else {
+            this.$message.error(re.message);
+          }
+        })
+        .finally(() => {
+          this.formLoading = false;
+        });
+    },
     submitForm() {
-      this.$refs.form.validate((valid) => {
+      this.$refs.form.validate(valid => {
         if (valid) {
-          this.formLoading = true
-          edit(this.form).then(re => {
-            if (re.code === 1) {
-              this.$message.success(re.message)
-              tagsView.delCurrentView(this).then(() => {
-                this.$router.push('/train/exam/paper/list')
-              })
-            } else {
-              this.$message.error(re.message)
-            }
-          }).finally(() => {
-            this.formLoading = false
-          })
+          this.formLoading = true;
+          edit(this.form)
+            .then(re => {
+              if (re.code === 1) {
+                this.$message.success(re.message);
+                tagsView.delCurrentView(this).then(() => {
+                  this.$router.go(-1);
+                });
+              } else {
+                this.$message.error(re.message);
+              }
+            })
+            .finally(() => {
+              this.formLoading = false;
+            });
         } else {
-          return false
+          return false;
         }
-      })
+      });
     },
     resetForm() {
       this.form = {
@@ -77,9 +105,9 @@ export default {
         title: null,
         name: '',
         linkPhone: ''
-      }
-      this.$refs['form'].resetFields()
+      };
+      this.$refs['form'].resetFields();
     }
   }
-}
+};
 </script>
