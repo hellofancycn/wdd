@@ -96,7 +96,7 @@
       <el-table-column width="300px" label="操作" align="center">
         <template #default="{ row }">
           <router-link
-            :to="{ path: '/user/employee/edit', query: { id: row.id } }"
+            :to="{ path: '/user/employee/train', query: { userId: row.id } }"
             class="link-left"
           >
             <el-button
@@ -108,7 +108,7 @@
             </el-button>
           </router-link>
           <router-link
-            :to="{ path: '/user/employee/edit', query: { id: row.id } }"
+            :to="{ path: '/user/employee/badRule', query: { userId: row.id } }"
             class="link-left"
           >
             <el-button

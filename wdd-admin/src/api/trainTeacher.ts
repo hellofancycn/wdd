@@ -1,4 +1,4 @@
-import { post, postWithLoadTip } from '@/utils/request';
+import { form, post, postWithLoadTip } from '@/utils/request';
 
 export function page(data: any): any {
   return post(`/api/teacher/page`, data);
@@ -17,7 +17,7 @@ export function edit(data: any): any {
 }
 
 export function getInfo(data: any): any {
-  return postWithLoadTip(`/api/teacher/getInfo`, data);
+  return form(`/api/teacher/getInfo`, data);
 }
 
 export function deleteTeacherApi(data: any): any {

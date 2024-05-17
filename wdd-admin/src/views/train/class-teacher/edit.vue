@@ -67,7 +67,7 @@ export default {
       getInfo({ id })
         .then(re => {
           if (re.code === 1) {
-            this.form = re.data;
+            this.form = re.response;
           } else {
             this.$message.error(re.message);
           }

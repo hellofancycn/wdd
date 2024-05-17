@@ -23,9 +23,10 @@
       highlight-current-row
       style="width: 100%"
     >
+      <el-table-column prop="dictSort" label="序号" show-overflow-tooltip />
       <el-table-column prop="dictType" label="dictId" />
       <el-table-column
-        prop="dictValue"
+        prop="dictCode"
         label="字典值编码"
         show-overflow-tooltip
       />
@@ -34,7 +35,6 @@
         label="字典值名称"
         show-overflow-tooltip
       />
-      <el-table-column prop="dictSort" label="序号" show-overflow-tooltip />
       <el-table-column prop="status" label="是否启用" show-overflow-tooltip>
         <template #default="{ row }">
           <el-tag

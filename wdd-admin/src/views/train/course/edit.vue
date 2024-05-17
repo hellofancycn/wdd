@@ -1,11 +1,17 @@
 <template>
   <div class="app-container">
     <!-- <el-tabs v-model="activeName" type="card" @tab-click="handleClick"> -->
-    <el-form ref="form" :model="form" label-width="170px" :rules="rules">
+    <el-form ref="form" :model="form" label-width="240px" :rules="rules">
       <!-- <el-tab-pane label="培训计划" name="first"> -->
       <el-form-item label="培训分类：">
-        <el-tree-select v-model="form.plan.train.trainArchiveId" :data="trainArchiveTree" check-strictly
-          :render-after-expand="true" default-expand-all placeholder="分类" />
+        <el-tree-select
+          v-model="form.plan.train.trainArchiveId"
+          :data="trainArchiveTree"
+          check-strictly
+          :render-after-expand="true"
+          default-expand-all
+          placeholder="分类"
+        />
       </el-form-item>
       <!-- <el-form-item label="渠道：">
             <el-select v-model="form.plan.train.offline" clearable>
@@ -22,17 +28,35 @@
       <el-form-item label="培训班名称：" prop="plan.train.name" required>
         <el-input v-model="form.plan.train.name"></el-input>
       </el-form-item>
-      <el-form-item label="培训对象：" required>
-        <div class="paper-user">
-          <el-tag v-for="user in form.trainUserList" :key="user.id" @close="removeUser(user)" closable>{{
-      user.realName }} - {{ user.userName }}
-          </el-tag>
-          <div>
-            <el-button type="success" size="small" class="link-left wdd-button-mini" @click="userSelectClick">选择员工
-            </el-button>
-          </div>
-        </div>
+      <el-form-item label="培训人员类别：" required>
+        <tree-select
+          v-model="form.departmentIdList"
+          :data="departmentTree"
+          :clearable="true"
+          placeholder="人员类别"
+          style="width: 100%"
+        />
       </el-form-item>
+      <!--      <el-form-item label="培训对象：" required>-->
+      <!--        <div class="paper-user">-->
+      <!--          <el-tag-->
+      <!--            v-for="user in form.trainUserList"-->
+      <!--            :key="user.id"-->
+      <!--            @close="removeUser(user)"-->
+      <!--            closable-->
+      <!--            >{{ user.realName }} - {{ user.userName }}-->
+      <!--          </el-tag>-->
+      <!--          <div>-->
+      <!--            <el-button-->
+      <!--              type="success"-->
+      <!--              size="small"-->
+      <!--              class="link-left wdd-button-mini"-->
+      <!--              @click="userSelectClick"-->
+      <!--              >选择员工-->
+      <!--            </el-button>-->
+      <!--          </div>-->
+      <!--        </div>-->
+      <!--      </el-form-item>-->
       <!-- <el-form-item label="考试范围：" prop="rangeType" required>
         <el-select v-model="form.rangeType" @change="rangeTypeChange" clearable>
           <el-option v-for="item in EnumMap.exam.build.rangeTypeEnum" :key="item.key" :value="item.key"
@@ -59,18 +83,30 @@
           </el-upload>
         </div>
       </el-form-item> -->
-      <el-form-item label="培训方式：" prop="plan.train.trainingFangshi" required>
+      <el-form-item
+        label="培训方式："
+        prop="plan.train.trainingFangshi"
+        required
+      >
         <el-input v-model="form.plan.train.trainingFangshi"></el-input>
       </el-form-item>
       <el-form-item label="培训类型：" prop="plan.train.trainingType" required>
         <el-input v-model="form.plan.train.trainingType"></el-input>
       </el-form-item>
       <el-form-item label="培训日期：" required>
-        <el-date-picker v-model="form.plan.train.startTime" placeholder="选择开始时间" value-format="YYYY-MM-DD HH:mm:ss"
-          type="datetime">
+        <el-date-picker
+          v-model="form.plan.train.startTime"
+          placeholder="选择开始时间"
+          value-format="YYYY-MM-DD HH:mm:ss"
+          type="datetime"
+        >
         </el-date-picker>
-        <el-date-picker v-model="form.plan.train.endTime" placeholder="选择结束时间" value-format="YYYY-MM-DD HH:mm:ss"
-          type="datetime">
+        <el-date-picker
+          v-model="form.plan.train.endTime"
+          placeholder="选择结束时间"
+          value-format="YYYY-MM-DD HH:mm:ss"
+          type="datetime"
+        >
         </el-date-picker>
       </el-form-item>
       <el-form-item label="培训地点：" prop="plan.train.trainingAdress">
@@ -81,40 +117,76 @@
         </el-date-picker>
        </el-form-item> -->
       <el-form-item label="封面：" prop="coverPath" required>
-        <el-upload accept=".jpg,.png" name="file" :data="{ folder: 'train/course' }" action="/api/upload/folder/file"
-          :show-file-list="false" :on-progress="uploadProgress" :on-success="uploadImageSuccess"
-          :on-error="uploadError">
-          <el-image style="width: 350px; height: 200px" :src="form.plan.train.coverPath" fit="fill"></el-image>
+        <el-upload
+          accept=".jpg,.png"
+          name="file"
+          :data="{ folder: 'train/course' }"
+          action="/api/upload/folder/file"
+          :show-file-list="false"
+          :on-progress="uploadProgress"
+          :on-success="uploadImageSuccess"
+          :on-error="uploadError"
+        >
+          <el-image
+            style="width: 350px; height: 200px"
+            :src="form.plan.train.coverPath"
+            fit="fill"
+          ></el-image>
         </el-upload>
       </el-form-item>
       <el-form-item label="培训描述：" prop="plan.traindescription">
-        <el-input v-model="form.plan.train.description" type="textarea" rows="8"></el-input>
+        <el-input
+          v-model="form.plan.train.description"
+          type="textarea"
+          rows="8"
+        ></el-input>
       </el-form-item>
       <el-form-item label="课程列表：" required>
         <el-tabs type="border-card" class="train-tab">
           <el-tab-pane label="课程">
             <div>
-              <draggable class="train-course-ware-content" item-key="index" group="courseWareItemList" handle=".drag"
-                v-model="form.plan.courseWareItemList">
+              <draggable
+                class="train-course-ware-content"
+                item-key="index"
+                group="courseWareItemList"
+                handle=".drag"
+                v-model="form.plan.courseWareItemList"
+              >
                 <template #item="{ index, element }">
                   <div class="train-course-ware">
                     <div class="train-course-ware-action">
-                      <el-button size="small" circle @click="courseWarePreview(element.previewPath)">
+                      <el-button
+                        size="small"
+                        circle
+                        @click="courseWarePreview(element.previewPath)"
+                      >
                         <el-icon>
                           <icon-view />
                         </el-icon>
                       </el-button>
                     </div>
-                    <div class="train-course-ware-content drag">{{ element.name }}</div>
+                    <div class="train-course-ware-content drag">
+                      {{ element.name }}
+                    </div>
                     <div class="train-course-ware-time">
                       <div>合格时长：</div>
-                      <el-input class="train-course-ware-input" placeholder="00:00:00"
-                        :formatter="(value) => `${value}`.replace(/[^\d|:]/g, '')" v-model.trim="element.passNumberStr"
-                        required />
-                      <div class="max-number-time">总时长：{{ element.maxNumberStr }}</div>
+                      <el-input
+                        class="train-course-ware-input"
+                        placeholder="00:00:00"
+                        :formatter="value => `${value}`.replace(/[^\d|:]/g, '')"
+                        v-model.trim="element.passNumberStr"
+                        required
+                      />
+                      <div class="max-number-time">
+                        总时长：{{ element.maxNumberStr }}
+                      </div>
                     </div>
                     <div class="train-course-ware-action">
-                      <el-button type="danger" circle @click="courseWareRemove(index)">
+                      <el-button
+                        type="danger"
+                        circle
+                        @click="courseWareRemove(index)"
+                      >
                         <el-icon>
                           <icon-delete />
                         </el-icon>
@@ -125,33 +197,64 @@
               </draggable>
             </div>
             <div>
-              <el-button type="primary" @click="addCourseWare">添加课程</el-button>
+              <el-button type="primary" @click="addCourseWare"
+                >添加课程</el-button
+              >
             </div>
           </el-tab-pane>
           <el-tab-pane label="试卷">
-            <div class="train-course-ware" v-if="form.plan.examPaperItem.targetId">
+            <div
+              class="train-course-ware"
+              v-if="form.plan.examPaperItem.targetId"
+            >
               <div class="train-course-ware-action">
-                <el-button size="small" circle @click="examPaperPreview(form.plan.examPaperItem.targetId)">
+                <el-button
+                  size="small"
+                  circle
+                  @click="examPaperPreview(form.plan.examPaperItem.targetId)"
+                >
                   <el-icon>
                     <icon-view />
                   </el-icon>
                 </el-button>
               </div>
-              <div class="train-course-ware-content">{{ form.plan.examPaperItem.name }}</div>
+              <div class="train-course-ware-content">
+                {{ form.plan.examPaperItem.name }}
+              </div>
               <div class="train-course-ware-time">
                 <div class="train-exam-paper-limit">
                   <div class="train-exam-paper-limit-item">
-                    <div class="train-exam-paper-limit-item-label">合格分：</div>
-                    <el-input-number v-model="form.plan.examPaperItem.passNumberStr" :precision="1" :step="1"
-                      :max="maxPassScore" :min="0.1" required></el-input-number>
+                    <div class="train-exam-paper-limit-item-label">
+                      合格分：
+                    </div>
+                    <el-input-number
+                      v-model="form.plan.examPaperItem.passNumberStr"
+                      :precision="1"
+                      :step="1"
+                      :max="maxPassScore"
+                      :min="0.1"
+                      required
+                    ></el-input-number>
                   </div>
-                  <div class="train-exam-paper-limit-item" style="margin-top: 5px">
-                    <div class="train-exam-paper-limit-item-label">考试次数：</div>
-                    <el-input-number v-model="form.plan.examPaperItem.allowCount" :step="1" :max="100" :min="0"
-                      required></el-input-number>
+                  <div
+                    class="train-exam-paper-limit-item"
+                    style="margin-top: 5px"
+                  >
+                    <div class="train-exam-paper-limit-item-label">
+                      考试次数：
+                    </div>
+                    <el-input-number
+                      v-model="form.plan.examPaperItem.allowCount"
+                      :step="1"
+                      :max="100"
+                      :min="0"
+                      required
+                    ></el-input-number>
                   </div>
                 </div>
-                <div class="max-number-time">试卷总分：{{ form.plan.examPaperItem.maxNumberStr }}</div>
+                <div class="max-number-time">
+                  试卷总分：{{ form.plan.examPaperItem.maxNumberStr }}
+                </div>
               </div>
               <div class="train-course-ware-action">
                 <el-button type="danger" circle @click="examPaperRemove">
@@ -162,22 +265,36 @@
               </div>
             </div>
             <div>
-              <el-button type="primary" @click="addExamPaper">选择试卷</el-button>
+              <el-button type="primary" @click="addExamPaper"
+                >选择试卷</el-button
+              >
             </div>
           </el-tab-pane>
           <el-tab-pane label="证书">
-            <div class="train-course-ware" v-if="form.plan.credentialItem.targetId">
+            <div
+              class="train-course-ware"
+              v-if="form.plan.credentialItem.targetId"
+            >
               <div class="train-course-ware-action">
-                <el-button size="small" circle @click="credentialShow(form.plan.credentialItem.targetId)">
+                <el-button
+                  size="small"
+                  circle
+                  @click="credentialShow(form.plan.credentialItem.targetId)"
+                >
                   <el-icon>
                     <icon-view />
                   </el-icon>
                 </el-button>
               </div>
               <div class="train-credential-content">
-                <el-image style="width: 50px; height: 50px" :src="form.plan.credentialItem.templateImagePath"
-                  fit="fill" />
-                <div class="train-credential-content-company">{{ form.plan.credentialItem.name }}</div>
+                <el-image
+                  style="width: 50px; height: 50px"
+                  :src="form.plan.credentialItem.templateImagePath"
+                  fit="fill"
+                />
+                <div class="train-credential-content-company">
+                  {{ form.plan.credentialItem.name }}
+                </div>
               </div>
               <div class="train-course-ware-action">
                 <el-button type="danger" circle @click="credentialRemove">
@@ -188,24 +305,124 @@
               </div>
             </div>
             <div>
-              <el-button type="primary" @click="addCredential">选择证书</el-button>
+              <el-button type="primary" @click="addCredential"
+                >选择证书</el-button
+              >
             </div>
           </el-tab-pane>
         </el-tabs>
       </el-form-item>
       <el-form-item label="排序：" prop="train.itemOrder">
-        <el-input-number v-model="form.plan.train.itemOrder" :precision="0" :step="1" :min="0"
-          :max="9999999"></el-input-number> </el-form-item>
-      <h4>班主任：</h4>
-      <el-form-item label="姓名：" prop="plan.train.trainingTeacher" required>
-        <el-input v-model="form.plan.train.trainingTeacher"></el-input>
+        <el-input-number
+          v-model="form.plan.train.itemOrder"
+          :precision="0"
+          :step="1"
+          :min="0"
+          :max="9999999"
+        ></el-input-number>
       </el-form-item>
-      <el-form-item label="电话：" prop="plan.train.trainingTeacherPhone" required>
-        <el-input v-model="form.plan.train.trainingTeacherPhone"></el-input>
+      <el-form-item label="班主任：">
+        <el-select v-model="form.teacherList[0].teacherId" clearable>
+          <el-option
+            v-for="item in teacherList"
+            :key="item.key"
+            :value="item.id"
+            :label="item.name"
+          ></el-option>
+        </el-select>
       </el-form-item>
-      <el-form-item label="邮箱或微信：" prop="plan.train.trainingTeacherWechat">
-        <el-input v-model="form.plan.train.trainingTeacherWechat"></el-input>
+
+      <!--      上传资料-->
+      <el-form-item label="资料上传：" required>
+        <el-tabs type="border-card" class="train-tab">
+          <el-tab-pane v-for="item in train_file_type" :label="item.dictLabel">
+            <el-upload
+              name="file"
+              :data="{ folder: 'train/course' }"
+              action="/api/upload/folder/file"
+              :show-file-list="true"
+              :on-progress="uploadProgress"
+              :on-success="
+                (response, file, fileList) => {
+                  return uploadSuccess(response, file, fileList, item);
+                }
+              "
+              :on-error="uploadError"
+            >
+              <el-button
+                type="primary"
+                size="small"
+                class="link-left wdd-button-mini"
+                >上传{{ item.dictLabel }}</el-button
+              >
+            </el-upload>
+
+            <!--            <el-upload-->
+            <!--              accept=".jpg,.png,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.pdf"-->
+            <!--              name="file"-->
+            <!--              :data="{ folder: 'train/course/' }"-->
+            <!--              action="/api/upload/folder/file"-->
+            <!--              :show-file-list="false"-->
+            <!--              :on-progress="uploadProgress"-->
+            <!--              :on-success="uploadImageSuccess"-->
+            <!--              :on-error="uploadError"-->
+            <!--            >-->
+            <!--              <el-image-->
+            <!--                style="width: 350px; height: 200px"-->
+            <!--                :src="form.coverPath"-->
+            <!--                fit="fill"-->
+            <!--              ></el-image>-->
+            <!--            </el-upload>-->
+
+            <!--            <el-upload-->
+            <!--              style="float: left"-->
+            <!--              accept=".doc,.docx,.xls,.xlsx,.ppt,.pptx,.pdf"-->
+            <!--              action="/api/course/ware/document/file"-->
+            <!--              :show-file-list="false"-->
+            <!--              :on-progress="uploadProgress"-->
+            <!--              :on-success="uploadSuccess"-->
+            <!--              :on-error="uploadError"-->
+            <!--            >-->
+            <!--              <el-button-->
+            <!--                type="success"-->
+            <!--                size="small"-->
+            <!--                class="link-left wdd-button-mini"-->
+            <!--                >上传文件</el-button-->
+            <!--              >-->
+            <!--            </el-upload>-->
+
+            <!--            <el-upload-->
+            <!--              style="float: left; margin-left: 5px"-->
+            <!--              accept=".xlsx"-->
+            <!--              :data="{ folder: 'yqyd' }"-->
+            <!--              action="/api/user/v1/employee/import"-->
+            <!--              :show-file-list="false"-->
+            <!--              :on-progress="uploadProgress"-->
+            <!--              :on-success="uploadExcelSuccess"-->
+            <!--              :on-error="uploadError"-->
+            <!--            >-->
+            <!--              <el-button type="success" class="link-left">上传</el-button>-->
+            <!--            </el-upload>-->
+          </el-tab-pane>
+        </el-tabs>
       </el-form-item>
+      <!--      <h4>班主任：</h4>-->
+      <!--      <el-form-item label="姓名：" prop="plan.train.trainingTeacher" required>-->
+      <!--        <el-input v-model="form.plan.train.trainingTeacher"></el-input>-->
+      <!--      </el-form-item>-->
+      <!--      <el-form-item-->
+      <!--        label="电话："-->
+      <!--        prop="plan.train.trainingTeacherPhone"-->
+      <!--        required-->
+      <!--      >-->
+      <!--        <el-input v-model="form.plan.train.trainingTeacherPhone"></el-input>-->
+      <!--      </el-form-item>-->
+      <!--      <el-form-item-->
+      <!--        label="邮箱或微信："-->
+      <!--        prop="plan.train.trainingTeacherWechat"-->
+      <!--      >-->
+      <!--        <el-input v-model="form.plan.train.trainingTeacherWechat"></el-input>-->
+      <!--      </el-form-item>-->
       <el-form-item>
         <el-button type="primary" @click="submitForm">提交</el-button>
         <el-button @click="resetForm">重置</el-button>
@@ -281,19 +498,34 @@
     </el-form>
     <!-- </el-tabs> -->
     <el-dialog v-model="courseWarePage.showDialog" width="90%">
-      <el-form :model="courseWarePage.queryParam" ref="courseWareQueryForm" :inline="true">
+      <el-form
+        :model="courseWarePage.queryParam"
+        ref="courseWareQueryForm"
+        :inline="true"
+      >
         <el-form-item label="类型：">
           <el-select v-model="courseWarePage.queryParam.fileType" clearable>
-            <el-option v-for="item in EnumMap.courseWare.fileType" :key="item.key" :value="item.key"
-              :label="item.value"></el-option>
+            <el-option
+              v-for="item in EnumMap.courseWare.fileType"
+              :key="item.key"
+              :value="item.key"
+              :label="item.value"
+            ></el-option>
           </el-select>
         </el-form-item>
         <el-form-item label="分类：">
-          <tree-select v-model="courseWarePage.queryParam.courseWareArchiveIdList" :data="courseWareArchiveTree"
-            :clearable="true" placeholder="培训分类" />
+          <tree-select
+            v-model="courseWarePage.queryParam.courseWareArchiveIdList"
+            :data="courseWareArchiveTree"
+            :clearable="true"
+            placeholder="培训分类"
+          />
         </el-form-item>
         <el-form-item label="名称：">
-          <el-input v-model="courseWarePage.queryParam.name" clearable></el-input>
+          <el-input
+            v-model="courseWarePage.queryParam.name"
+            clearable
+          ></el-input>
         </el-form-item>
         <el-form-item>
           <el-button type="primary" @click="courseWareSearch">查询</el-button>
@@ -301,8 +533,14 @@
           <el-button type="primary" @click="courseWareAdd">添加</el-button>
         </el-form-item>
       </el-form>
-      <el-table :data="courseWarePage.tableData" @row-click="courseWareClick" border fit highlight-current-row
-        style="width: 100%">
+      <el-table
+        :data="courseWarePage.tableData"
+        @row-click="courseWareClick"
+        border
+        fit
+        highlight-current-row
+        style="width: 100%"
+      >
         <el-table-column prop="id" label="Id" width="90px" />
         <el-table-column prop="fileTypeStr" label="培训类型" width="90px" />
         <el-table-column prop="level" label="培训分类" width="120px" />
@@ -312,28 +550,47 @@
         <el-table-column prop="createTime" label="创建时间" width="160px" />
         <el-table-column width="80px" label="操作" align="center">
           <template #default="{ row }">
-            <el-button class="wdd-button-mini" size="small" @click.stop="courseWarePreview(row.previewPath)">
+            <el-button
+              class="wdd-button-mini"
+              size="small"
+              @click.stop="courseWarePreview(row.previewPath)"
+            >
               预览
             </el-button>
           </template>
         </el-table-column>
       </el-table>
-      <pagination v-show="courseWarePage.total > 0" :total="courseWarePage.total"
-        v-model:page="courseWarePage.queryParam.pageIndex" v-model:limit="courseWarePage.queryParam.pageSize"
-        @pagination="courseWareSearch" />
+      <pagination
+        v-show="courseWarePage.total > 0"
+        :total="courseWarePage.total"
+        v-model:page="courseWarePage.queryParam.pageIndex"
+        v-model:limit="courseWarePage.queryParam.pageSize"
+        @pagination="courseWareSearch"
+      />
     </el-dialog>
 
     <el-dialog v-model="courseWarePage.addCourse" width="70%">
       <courseAdd />
     </el-dialog>
     <el-dialog v-model="examPaperPage.showDialog" width="90%">
-      <el-form :model="examPaperPage.queryParam" ref="examPaperQueryForm" :inline="true">
+      <el-form
+        :model="examPaperPage.queryParam"
+        ref="examPaperQueryForm"
+        :inline="true"
+      >
         <el-form-item label="分类：">
-          <tree-select v-model="examPaperPage.queryParam.examPaperArchiveIdList" :data="examPaperArchiveTree"
-            :clearable="true" placeholder="试卷分类" />
+          <tree-select
+            v-model="examPaperPage.queryParam.examPaperArchiveIdList"
+            :data="examPaperArchiveTree"
+            :clearable="true"
+            placeholder="试卷分类"
+          />
         </el-form-item>
         <el-form-item label="名称：">
-          <el-input v-model="examPaperPage.queryParam.name" clearable></el-input>
+          <el-input
+            v-model="examPaperPage.queryParam.name"
+            clearable
+          ></el-input>
         </el-form-item>
         <el-form-item>
           <el-button type="primary" @click="examPaperSearch">查询</el-button>
@@ -341,8 +598,14 @@
           <el-button type="primary" @click="examAdd">添加</el-button>
         </el-form-item>
       </el-form>
-      <el-table :data="examPaperPage.tableData" @row-click="examPaperClick" border fit highlight-current-row
-        style="width: 100%">
+      <el-table
+        :data="examPaperPage.tableData"
+        @row-click="examPaperClick"
+        border
+        fit
+        highlight-current-row
+        style="width: 100%"
+      >
         <el-table-column prop="id" label="Id" width="90px" />
         <el-table-column prop="level" label="试卷分类" width="120px" />
         <el-table-column prop="name" label="试卷名称" />
@@ -352,24 +615,39 @@
         <el-table-column prop="createTime" label="创建时间" width="160px" />
         <el-table-column width="80px" label="操作" align="center">
           <template #default="{ row }">
-            <el-button class="wdd-button-mini" size="small" @click.stop="examPaperPreview(row.id)">
+            <el-button
+              class="wdd-button-mini"
+              size="small"
+              @click.stop="examPaperPreview(row.id)"
+            >
               预览
             </el-button>
           </template>
         </el-table-column>
       </el-table>
-      <pagination v-show="examPaperPage.total > 0" :total="examPaperPage.total"
-        v-model:page="examPaperPage.queryParam.pageIndex" v-model:limit="examPaperPage.queryParam.pageSize"
-        @pagination="examPaperSearch" />
+      <pagination
+        v-show="examPaperPage.total > 0"
+        :total="examPaperPage.total"
+        v-model:page="examPaperPage.queryParam.pageIndex"
+        v-model:limit="examPaperPage.queryParam.pageSize"
+        @pagination="examPaperSearch"
+      />
     </el-dialog>
     <el-dialog v-model="examPaperPage.examAdd" width="70%">
       <examAdd />
     </el-dialog>
 
     <el-dialog v-model="credentialPage.showDialog" width="90%">
-      <el-form :model="credentialPage.queryParam" ref="credentialQueryForm" :inline="true">
+      <el-form
+        :model="credentialPage.queryParam"
+        ref="credentialQueryForm"
+        :inline="true"
+      >
         <el-form-item label="名称：">
-          <el-input v-model="credentialPage.queryParam.name" clearable></el-input>
+          <el-input
+            v-model="credentialPage.queryParam.name"
+            clearable
+          ></el-input>
         </el-form-item>
         <el-form-item>
           <el-button type="primary" @click="credentialSearch">查询</el-button>
@@ -377,12 +655,22 @@
         </el-form-item>
       </el-form>
 
-      <el-table :data="credentialPage.tableData" @row-click="credentialClick" border fit highlight-current-row
-        style="width: 100%">
+      <el-table
+        :data="credentialPage.tableData"
+        @row-click="credentialClick"
+        border
+        fit
+        highlight-current-row
+        style="width: 100%"
+      >
         <el-table-column prop="id" label="Id" width="90px" />
         <el-table-column prop="templateImagePath" label="证书模板" width="90px">
           <template #default="{ row }">
-            <el-image style="width: 50px; height: 50px" :src="row.templateImagePath" fit="fill" />
+            <el-image
+              style="width: 50px; height: 50px"
+              :src="row.templateImagePath"
+              fit="fill"
+            />
           </template>
         </el-table-column>
         <el-table-column prop="name" label="证书模板名称" />
@@ -390,15 +678,23 @@
         <el-table-column prop="createTime" label="创建时间" width="160px" />
         <el-table-column width="80px" label="操作" align="center">
           <template #default="{ row }">
-            <el-button size="small" class="wdd-button-mini" @click.stop="credentialShow(row.id)">
+            <el-button
+              size="small"
+              class="wdd-button-mini"
+              @click.stop="credentialShow(row.id)"
+            >
               预览
             </el-button>
           </template>
         </el-table-column>
       </el-table>
-      <pagination v-show="credentialPage.total > 0" :total="credentialPage.total"
-        v-model:page="credentialPage.queryParam.pageIndex" v-model:limit="credentialPage.queryParam.pageSize"
-        @pagination="credentialSearch" />
+      <pagination
+        v-show="credentialPage.total > 0"
+        :total="credentialPage.total"
+        v-model:page="credentialPage.queryParam.pageIndex"
+        v-model:limit="credentialPage.queryParam.pageSize"
+        @pagination="credentialSearch"
+      />
     </el-dialog>
 
     <el-dialog v-model="userPageDialog" width="98%">
@@ -410,15 +706,28 @@
           <el-input v-model="userPage.queryParam.realName" clearable></el-input>
         </el-form-item>
         <el-form-item label="人员类别：">
-          <tree-select v-model="userPage.queryParam.departmentIdList" :data="departmentTree" :clearable="true"
-            placeholder="人员类别" />
+          <tree-select
+            v-model="userPage.queryParam.departmentIdList"
+            :data="departmentTree"
+            :clearable="true"
+            placeholder="人员类别"
+          />
         </el-form-item>
         <el-form-item>
           <el-button type="primary" @click="userQueryForm">查询</el-button>
         </el-form-item>
       </el-form>
-      <el-table v-loading="userPage.listLoading" ref="userMultipleTable" :data="userPage.tableData" @select="useSelect"
-        @select-all="useSelectAll" border fit highlight-current-row style="width: 100%">
+      <el-table
+        v-loading="userPage.listLoading"
+        ref="userMultipleTable"
+        :data="userPage.tableData"
+        @select="useSelect"
+        @select-all="useSelectAll"
+        border
+        fit
+        highlight-current-row
+        style="width: 100%"
+      >
         <el-table-column type="selection" width="40"></el-table-column>
         <el-table-column prop="id" label="Id" width="90px" />
         <el-table-column prop="userName" label="用户名" />
@@ -429,33 +738,47 @@
         <el-table-column prop="email" label="邮箱" />
         <el-table-column prop="createTime" label="创建时间" width="160px" />
       </el-table>
-      <pagination v-show="userPage.total > 0" :total="userPage.total" v-model:page="userPage.queryParam.pageIndex"
-        v-model:limit="userPage.queryParam.pageSize" @pagination="userSearch" :autoScroll="false" />
+      <pagination
+        v-show="userPage.total > 0"
+        :total="userPage.total"
+        v-model:page="userPage.queryParam.pageIndex"
+        v-model:limit="userPage.queryParam.pageSize"
+        @pagination="userSearch"
+        :autoScroll="false"
+      />
     </el-dialog>
   </div>
 </template>
 
 <script>
+import { EnumMap } from '@/api/EnumMap';
+import { employeePage } from '@/api/user';
+import { numberConvert, disabledDate } from '@/utils';
+import {
+  Delete as IconDelete,
+  View as IconView
+} from '@element-plus/icons-vue';
+import { tree as archiveTree } from '@/api/trainArchive';
+import { tree as courseWareTree } from '@/api/courseWareArchive';
+import { tree as examPaperTree } from '@/api/examPaperArchive';
+import { tree } from '@/api/department';
 
-import { EnumMap } from '@/api/EnumMap'
-import { employeePage } from '@/api/user'
-import { numberConvert, disabledDate } from '@/utils'
-import { Delete as IconDelete, View as IconView } from '@element-plus/icons-vue'
-import { tree as archiveTree } from '@/api/trainArchive'
-import { tree as courseWareTree } from '@/api/courseWareArchive'
-import { tree as examPaperTree } from '@/api/examPaperArchive'
-import { tree } from '@/api/department'
-import { select, edit } from '@/api/train'
-import { page as courseWarePage } from '@/api/courseWare'
-import { page as examPaperPage } from '@/api/trainExamPaper'
-import { page as credentialPage, select as credentialSelect, preview as credentialPreview } from '@/api/credential'
-import useStore from '@/store'
-import draggable from 'vuedraggable'
-import courseAdd from '@/views/train/course-ware/edit.vue'
-import examAdd from '@/views/train/exam-paper/edit.vue'
+import { select, edit } from '@/api/train';
+import { page as courseWarePage } from '@/api/courseWare';
+import { page as examPaperPage } from '@/api/trainExamPaper';
+import {
+  page as credentialPage,
+  select as credentialSelect,
+  preview as credentialPreview
+} from '@/api/credential';
+import useStore from '@/store';
+import draggable from 'vuedraggable';
+import courseAdd from '@/views/train/course-ware/edit.vue';
+import examAdd from '@/views/train/exam-paper/edit.vue';
+import { page as teacherPage } from '@/api/trainTeacher';
+import { getDictDataInfo, getDictDataType } from '@/api/dictManagement';
 
-
-const { tagsView } = useStore()
+const { tagsView } = useStore();
 
 export default {
   name: 'TrainCourseEdit',
@@ -492,7 +815,7 @@ export default {
           },
           courseWareItemList: [],
           examPaperItem: {},
-          credentialItem: {},
+          credentialItem: {}
         },
         trainUserList: [],
         course: [],
@@ -503,52 +826,64 @@ export default {
           part4: null,
           part5: null,
           part6: null,
-          createUserDept: null,
+          createUserDept: null
         },
-        teacherSign: []
+        departmentIdList: null,
+        fileList: [],
+        teacherSign: [],
+        teacherList: [{ teacherId: '' }]
       },
       rules: {
-        "plan.train.trainingUnit": [
+        'plan.train.trainingUnit': [
           { required: true, message: '请输入培训单位', trigger: 'blur' }
         ],
-        "plan.train.trainingType": [
+        'plan.train.trainingType': [
           { required: true, message: '请输入培训类型', trigger: 'blur' }
         ],
-        "plan.train.trainingFangshi": [
+        'plan.train.trainingFangshi': [
           { required: true, message: '请输入培训方式', trigger: 'blur' }
         ],
-        "plan.train.trainingTeacher": [
+        'plan.train.trainingTeacher': [
           { required: true, message: '请输入班主任姓名', trigger: 'blur' }
         ],
-        "plan.train.trainingTeacherPhone": [
+        'plan.train.trainingTeacherPhone': [
           { required: true, message: '请输入班主任电话', trigger: 'blur' }
         ],
-        "plan.train.name": [
+        'plan.train.name': [
           { required: true, message: '请输入培训班名称', trigger: 'blur' }
         ],
-        "report.part1": [
-          { required: true, message: '请输入基本情况', trigger: 'blur' }],
-        "report.part2": [
-          { required: true, message: '请输入学业落实', trigger: 'blur' }],
-        "report.part3": [
-          { required: true, message: '请输入课程的落实', trigger: 'blur' }],
-        "report.part4": [
-          { required: true, message: '请输入培训成效', trigger: 'blur' }],
-        "report.part5": [
-          { required: true, message: '请输入存在问题', trigger: 'blur' }],
-        "report.part6": [
-          { required: true, message: '请输入建议和措施', trigger: 'blur' },
+        'report.part1': [
+          { required: true, message: '请输入基本情况', trigger: 'blur' }
         ],
-        "report.createUserDept": [
-          { required: true, message: '请输入培训机构负责人人员类别', trigger: 'blur' },
+        'report.part2': [
+          { required: true, message: '请输入学业落实', trigger: 'blur' }
         ],
+        'report.part3': [
+          { required: true, message: '请输入课程的落实', trigger: 'blur' }
+        ],
+        'report.part4': [
+          { required: true, message: '请输入培训成效', trigger: 'blur' }
+        ],
+        'report.part5': [
+          { required: true, message: '请输入存在问题', trigger: 'blur' }
+        ],
+        'report.part6': [
+          { required: true, message: '请输入建议和措施', trigger: 'blur' }
+        ],
+        'report.createUserDept': [
+          {
+            required: true,
+            message: '请输入培训机构负责人人员类别',
+            trigger: 'blur'
+          }
+        ]
       },
       courseFrom: {
         courseContent: null,
         courseTime: null,
         courseTeacher: null,
         courseTeacherTitle: null,
-        remark: null,
+        remark: null
       },
       list: {
         docUrl: null
@@ -612,92 +947,111 @@ export default {
       departmentTree: [],
       trainArchiveTree: [],
       courseWareArchiveTree: [],
-      examPaperArchiveTree: []
-    }
+      examPaperArchiveTree: [],
+      teacherList: [],
+      train_file_type: []
+    };
   },
   computed: {
     maxPassScore: function () {
-      let sumScore = this.form.plan.examPaperItem.maxNumberStr
+      let sumScore = this.form.plan.examPaperItem.maxNumberStr;
       if (undefined !== sumScore && null !== sumScore && sumScore > 0) {
-        return Number(sumScore)
+        return Number(sumScore);
       }
-      return 100
+      return 100;
     }
   },
   created() {
-    let id = this.$route.query.id
+    let id = this.$route.query.id;
 
     if (id && parseInt(id) !== 0) {
-      this.formLoading = true
-      select(id).then(re => {
-        this.form = re.response
-        console.log(re.response, '表单数据')
-        if (this.form.plan.examPaperItem.passNumberStr) {
-          this.form.plan.examPaperItem.passNumberStr = numberConvert(this.form.plan.examPaperItem.passNumberStr)
-        }
-      }).finally(() => {
-        this.formLoading = false
-      })
+      this.formLoading = true;
+      select(id)
+        .then(re => {
+          this.form = re.response;
+          console.log(re.response, '表单数据');
+          if (this.form.plan.examPaperItem.passNumberStr) {
+            this.form.plan.examPaperItem.passNumberStr = numberConvert(
+              this.form.plan.examPaperItem.passNumberStr
+            );
+          }
+        })
+        .finally(() => {
+          this.formLoading = false;
+        });
     }
 
     tree().then(re => {
-      console.log(re)
-      this.departmentTree = re.response
-    })
+      console.log(re);
+      this.departmentTree = re.response;
+      console.log('  this.departmentTree', this.departmentTree);
+    });
 
     archiveTree().then(re => {
-      this.trainArchiveTree = re.response
-    })
+      this.trainArchiveTree = re.response;
+    });
 
     courseWareTree().then(re => {
-      this.courseWareArchiveTree = re.response
-    })
+      this.courseWareArchiveTree = re.response;
+    });
 
     examPaperTree().then(re => {
-      this.examPaperArchiveTree = re.response
-    })
+      this.examPaperArchiveTree = re.response;
+    });
+    getDictDataType('train_file_type').then(re => {
+      this.train_file_type = re.response;
+    });
+
+    this.getTeacherPage();
+    // console.log(1, getDictDataInfoFun(100));
   },
   methods: {
+    async getDictDataInfoFun(id) {
+      let { response } = await getDictDataInfo(id);
+
+      console.log(response);
+      return response.dictLabel;
+    },
     uploadProgress() {
       this.loading = this.$loading({
         lock: true,
         text: '文件上传中…',
         spinner: 'el-icon-loading',
         background: 'rgba(0, 0, 0, 0.5)'
-      })
+      });
     },
     uploadImageSuccess(re, file) {
-      this.loading.close()
-      this.form.plan.train.coverPath = re.response.path
+      this.loading.close();
+      this.form.plan.train.coverPath = re.response.path;
     },
     upload(re, file) {
-      this.loading.close()
-      this.list.docUrl = re.response.path
-      this.form.teacherSign.push(this.list)
-      console.log(this.form.teacherSign)
+      this.loading.close();
+      this.list.docUrl = re.response.path;
+      this.form.teacherSign.push(this.list);
+      console.log(this.form.teacherSign);
     },
     uploadError() {
-      this.loading.close()
-      this.$message.error('文件上传失败，请检查文件大小或文件格式')
+      this.loading.close();
+      this.$message.error('文件上传失败，请检查文件大小或文件格式');
     },
     addCourseWare() {
-      this.courseWareSearch()
-      this.courseWarePage.showDialog = true
+      this.courseWareSearch();
+      this.courseWarePage.showDialog = true;
     },
     courseWareAdd() {
-      this.courseWarePage.addCourse = true
+      this.courseWarePage.addCourse = true;
     },
     courseWareSearch() {
-      this.courseWarePage.queryParam.selectIdList = []
+      this.courseWarePage.queryParam.selectIdList = [];
       for (const item of this.form.plan.courseWareItemList) {
-        this.courseWarePage.queryParam.selectIdList.push(item.targetId)
+        this.courseWarePage.queryParam.selectIdList.push(item.targetId);
       }
       courseWarePage(this.courseWarePage.queryParam).then(data => {
-        const re = data.response
-        this.courseWarePage.tableData = re.list
-        this.courseWarePage.total = re.total
-        this.courseWarePage.queryParam.pageIndex = re.pageNum
-      })
+        const re = data.response;
+        this.courseWarePage.tableData = re.list;
+        this.courseWarePage.total = re.total;
+        this.courseWarePage.queryParam.pageIndex = re.pageNum;
+      });
     },
     courseWareClear() {
       this.courseWarePage.queryParam = {
@@ -707,8 +1061,8 @@ export default {
         selectIdList: [],
         pageIndex: 1,
         pageSize: 10
-      }
-      this.courseWareSearch()
+      };
+      this.courseWareSearch();
     },
     courseWareClick(row) {
       this.form.plan.courseWareItemList.push({
@@ -721,30 +1075,32 @@ export default {
         maxNumberStr: row.maxLengthStr,
         previewPath: row.previewPath,
         fileType: row.fileType
-      })
-      this.courseWarePage.showDialog = false
+      });
+      this.courseWarePage.showDialog = false;
     },
     courseWareRemove(index) {
-      this.form.plan.courseWareItemList.splice(index, 1)
+      this.form.plan.courseWareItemList.splice(index, 1);
     },
     courseWarePreview(url) {
-      window.open(url, '_blank')
+      window.open(url, '_blank');
     },
     addExamPaper() {
-      this.examPaperSearch()
-      this.examPaperPage.showDialog = true
+      this.examPaperSearch();
+      this.examPaperPage.showDialog = true;
     },
     examPaperSearch() {
-      this.examPaperPage.queryParam.selectIdList = []
+      this.examPaperPage.queryParam.selectIdList = [];
       if (null != this.form.plan.examPaperItem.targetId) {
-        this.examPaperPage.queryParam.selectIdList.push(this.form.plan.examPaperItem.targetId)
+        this.examPaperPage.queryParam.selectIdList.push(
+          this.form.plan.examPaperItem.targetId
+        );
       }
       examPaperPage(this.examPaperPage.queryParam).then(data => {
-        const re = data.response
-        this.examPaperPage.tableData = re.list
-        this.examPaperPage.total = re.total
-        this.examPaperPage.queryParam.pageIndex = re.pageNum
-      })
+        const re = data.response;
+        this.examPaperPage.tableData = re.list;
+        this.examPaperPage.total = re.total;
+        this.examPaperPage.queryParam.pageIndex = re.pageNum;
+      });
     },
     examPaperClear() {
       this.examPaperPage.queryParam = {
@@ -753,11 +1109,11 @@ export default {
         selectIdList: [],
         pageIndex: 1,
         pageSize: 10
-      }
-      this.examPaperSearch()
+      };
+      this.examPaperSearch();
     },
     examAdd() {
-      this.examPaperPage.examAdd = true
+      this.examPaperPage.examAdd = true;
     },
     examPaperClick(row) {
       this.form.plan.examPaperItem = {
@@ -768,38 +1124,40 @@ export default {
         passNumberStr: null,
         allowCount: null,
         maxNumberStr: row.score
-      }
-      this.examPaperPage.showDialog = false
+      };
+      this.examPaperPage.showDialog = false;
     },
     examPaperRemove() {
-      this.form.plan.examPaperItem = {}
+      this.form.plan.examPaperItem = {};
     },
     examPaperPreview(id) {
-      window.open(`/#/train/exam/paper/show?id=${id}`, '_blank')
+      window.open(`/#/train/exam/paper/show?id=${id}`, '_blank');
     },
     addCredential() {
-      this.credentialSearch()
-      this.credentialPage.showDialog = true
+      this.credentialSearch();
+      this.credentialPage.showDialog = true;
     },
     credentialSearch() {
-      this.credentialPage.queryParam.selectIdList = []
+      this.credentialPage.queryParam.selectIdList = [];
       if (null != this.form.plan.credentialItem.targetId) {
-        this.credentialPage.queryParam.selectIdList.push(this.form.plan.credentialItem.targetId)
+        this.credentialPage.queryParam.selectIdList.push(
+          this.form.plan.credentialItem.targetId
+        );
       }
       credentialPage(this.credentialPage.queryParam).then(data => {
-        const re = data.response
-        this.credentialPage.tableData = re.list
-        this.credentialPage.total = re.total
-        this.credentialPage.queryParam.pageIndex = re.pageNum
-      })
+        const re = data.response;
+        this.credentialPage.tableData = re.list;
+        this.credentialPage.total = re.total;
+        this.credentialPage.queryParam.pageIndex = re.pageNum;
+      });
     },
     credentialClear() {
       this.credentialPage.queryParam = {
         name: null,
         pageIndex: 1,
         pageSize: 10
-      }
-      this.credentialSearch()
+      };
+      this.credentialSearch();
     },
     credentialClick(row) {
       this.form.plan.credentialItem = {
@@ -807,37 +1165,39 @@ export default {
         name: row.name,
         targetId: row.id,
         templateImagePath: row.templateImagePath
-      }
-      this.credentialPage.showDialog = false
+      };
+      this.credentialPage.showDialog = false;
     },
     credentialRemove() {
-      this.form.plan.credentialItem = {}
+      this.form.plan.credentialItem = {};
     },
     credentialShow(id) {
       credentialSelect(id).then(re => {
         credentialPreview(re.response).then(re => {
-          window.open(re.response, '_blank')
-        })
-      })
+          window.open(re.response, '_blank');
+        });
+      });
     },
     submitForm() {
-      console.log(this.form, '原始数据')
+      console.log(this.form, '原始数据');
       // this.$refs.form.validate((valid) => {
       // if (valid) {
-      this.formLoading = true
-      edit(this.form).then(data => {
-        console.log(this.form, '数据')
-        if (data.code === 1) {
-          this.$message.success(data.message)
-          tagsView.delCurrentView(this).then(() => {
-            this.$router.push('/train/course/list')
-          })
-        } else {
-          this.$message.error(data.message)
-        }
-      }).finally(() => {
-        this.formLoading = false
-      })
+      this.formLoading = true;
+      edit(this.form)
+        .then(data => {
+          console.log(this.form, '数据');
+          if (data.code === 1) {
+            this.$message.success(data.message);
+            tagsView.delCurrentView(this).then(() => {
+              this.$router.push('/train/course/list');
+            });
+          } else {
+            this.$message.error(data.message);
+          }
+        })
+        .finally(() => {
+          this.formLoading = false;
+        });
       // }
       // })
     },
@@ -866,8 +1226,7 @@ export default {
           },
           courseWareItemList: [],
           examPaperItem: {},
-          credentialItem: {},
-
+          credentialItem: {}
         },
         trainUserList: [],
         course: [],
@@ -878,104 +1237,108 @@ export default {
           part4: null,
           part5: null,
           part6: null,
-          createUserDept: null,
+          createUserDept: null
         },
         teacherSign: []
-      }
-      this.$refs['form'].resetFields()
+      };
+      this.$refs['form'].resetFields();
     },
     // 选择员工
     userSelectClick() {
-      this.userPageDialog = true
-      this.userSearch()
+      this.userPageDialog = true;
+      this.userSearch();
       // console.log(this.userPage.showDialog)
     },
     userQueryForm() {
-      this.userPage.queryParam.pageIndex = 1
-      this.userSearch()
+      this.userPage.queryParam.pageIndex = 1;
+      this.userSearch();
     },
     useSelectAll(selection) {
-      console.log(selection, '9999')
+      console.log(selection, '9999');
       if (selection.length === 0) {
         this.userPage.tableData.forEach(item => {
-          this.useSelectArray(item, 3)
-        })
+          this.useSelectArray(item, 3);
+        });
       } else {
         selection.forEach(item => {
-          this.useSelectArray(item, 2)
-        })
+          this.useSelectArray(item, 2);
+        });
       }
-      this.$message.success('操作成功')
+      this.$message.success('操作成功');
     },
     useSelectArray(userItem, action) {
-      console.log(userItem, '22222')
-      let array = this.form.trainUserList
-      console.log(this.form.trainUserList, '4234')
-      let index = null
+      console.log(userItem, '22222');
+      let array = this.form.trainUserList;
+      console.log(this.form.trainUserList, '4234');
+      let index = null;
       for (let i = 0; i < array.length; i++) {
         if (userItem.id === array[i].id) {
-          index = i
+          index = i;
         }
       }
-      if (action === 1) { // revert
+      if (action === 1) {
+        // revert
         if (index == null) {
           this.form.trainUserList.push({
             createUser: userItem.id,
             userName: userItem.userName,
             realName: userItem.realName,
             departmentId: userItem.departmentId
-          })
+          });
         } else {
-          this.form.trainUserList.splice(index, 1)
+          this.form.trainUserList.splice(index, 1);
         }
-      } else if (action === 2) { // add
+      } else if (action === 2) {
+        // add
         if (index == null) {
           this.form.trainUserList.push({
             createUser: userItem.id,
             userName: userItem.userName,
             realName: userItem.realName,
             departmentId: userItem.departmentId
-          })
+          });
         }
-      } else if (action === 3) { // remove
+      } else if (action === 3) {
+        // remove
         if (index != null) {
-          this.form.trainUserList.splice(index, 1)
+          this.form.trainUserList.splice(index, 1);
         }
       }
     },
     useSelect(selection, row) {
-      console.log(selection)
-      this.useSelectArray(row, 1)
-      this.$message.success('操作成功')
+      console.log(selection);
+      this.useSelectArray(row, 1);
+      this.$message.success('操作成功');
     },
     removeUser(user) {
-      this.form.trainUserList.splice(this.form.trainUserList.indexOf(user), 1)
+      this.form.trainUserList.splice(this.form.trainUserList.indexOf(user), 1);
     },
     userSearch() {
       // this.userPage.queryParam.excludeDepartmentIdList = this.form.trainingUserDept
-      this.userPage.listLoading = true
-      employeePage(this.userPage.queryParam).then(data => {
-        console.log(data, '42343')
-        const re = data.response
-        this.userPage.tableData = re.list
-        this.userPage.total = re.total
-        this.userPage.queryParam.pageIndex = re.pageNum
-        this.$nextTick(() => {
-          let userSelectList = this.form.trainUserList
-          this.userPage.tableData.forEach(row => {
-            for (let i = 0; i < userSelectList.length; i++) {
-              if (userSelectList[i].id === row.id) {
-                this.$refs.userMultipleTable.toggleRowSelection(row, true)
+      this.userPage.listLoading = true;
+      employeePage(this.userPage.queryParam)
+        .then(data => {
+          console.log(data, '42343');
+          const re = data.response;
+          this.userPage.tableData = re.list;
+          this.userPage.total = re.total;
+          this.userPage.queryParam.pageIndex = re.pageNum;
+          this.$nextTick(() => {
+            let userSelectList = this.form.trainUserList;
+            this.userPage.tableData.forEach(row => {
+              for (let i = 0; i < userSelectList.length; i++) {
+                if (userSelectList[i].id === row.id) {
+                  this.$refs.userMultipleTable.toggleRowSelection(row, true);
+                }
               }
-            }
-          })
+            });
+          });
         })
-      }).finally(() => {
-        this.userPage.listLoading = false
-      })
+        .finally(() => {
+          this.userPage.listLoading = false;
+        });
     },
-    handleClick(tab, event) {
-    },
+    handleClick(tab, event) {},
     beforeUpload(file) {
       const { name, size } = file;
       const index = name.lastIndexOf('.');
@@ -983,7 +1346,7 @@ export default {
       if (index === -1) {
         this.$notify.error({
           title: '错误',
-          message: `${name}文件错误，请重新上传！`,
+          message: `${name}文件错误，请重新上传！`
         });
         return false;
       }
@@ -993,7 +1356,7 @@ export default {
       if (!acceptFileTypes.includes(fileType)) {
         this.$notify.error({
           title: '错误',
-          message: `${name}文件类型错误，请重新上传！`,
+          message: `${name}文件类型错误，请重新上传！`
         });
         return false;
       }
@@ -1001,7 +1364,7 @@ export default {
       if (size > 10 * 1024 * 1024) {
         this.$notify.error({
           title: '错误',
-          message: `${name}文件大小超过10M，请重新上传！`,
+          message: `${name}文件大小超过10M，请重新上传！`
         });
         return false;
       }
@@ -1010,30 +1373,28 @@ export default {
     },
 
     // 上传接口调取成功status为200
-    uploadSuccess(res, file) {
-      if (res.code === 200) {  // 文件上传成功
+    uploadSuccess(res, file, fileList, item) {
+      console.log(res);
+
+      if (res.code === 1) {
+        // 文件上传成功
         this.$notify.success({
           title: '成功',
-          message: `${file.name}文件上传成功！`,
+          message: `${file.name}文件上传成功！`
         });
+        this.loading.close();
       } else {
         this.uploadError();
       }
-    },
-
-    // 文件上传失败
-    uploadError() {
-      this.$notify.error({
-        title: '错误',
-        message: '文件上传失败！',
-      });
     },
 
     // 文件个数超过限制
     uploadExceed(files, fileList) {
       this.$notify.warning({
         title: '提示',
-        message: `当前限制一次可选择 5 个文件，本次选择了 ${files.length} 个文件，共选择了 ${files.length + fileList.length} 个文件`,
+        message: `当前限制一次可选择 5 个文件，本次选择了 ${
+          files.length
+        } 个文件，共选择了 ${files.length + fileList.length} 个文件`
       });
     },
     add() {
@@ -1042,37 +1403,55 @@ export default {
         courseTime: null,
         courseTeacher: null,
         courseTeacherTitle: null,
-        remark: null,
-      })
+        remark: null
+      });
     },
     handleRemove(file, fileList) {
       console.log(file, fileList);
     },
     handlePictureCardPreview(file) {
-      console.log(file)
+      console.log(file);
       this.dialogImageUrl = file.url;
-      console.log(this.dialogImageUrl)
+      console.log(this.dialogImageUrl);
       this.dialogVisible = true;
     },
     //删除上传文件
     teacherSignDelete(row) {
-      console.log(row, '文件信息')
-      this.form.teacherSign.splice(this.form.teacherSign.indexOf(row.id), 1)
-      console.log(this.form.teacherSign)
+      console.log(row, '文件信息');
+      this.form.teacherSign.splice(this.form.teacherSign.indexOf(row.id), 1);
+      console.log(this.form.teacherSign);
     },
     //查看
     teacherSignShow(row) {
-      window.open(row.docUrl, '_blank')
+      window.open(row.docUrl, '_blank');
     },
     RemoveData(index) {
-      console.log(index, "当前删除的下标");
+      console.log(index, '当前删除的下标');
       this.form.course.splice(index, 1);
     },
+    getTeacherPage() {
+      let queryParam = {
+        pageIndex: 1,
+        pageSize: 10,
+        name: null,
+        examPaperArchiveIdList: []
+      };
+      teacherPage(queryParam).then(data => {
+        const re = data.response;
+        this.teacherList = re.list;
+      });
+    },
+    getbumen() {
+      tree().then(re => {
+        this.departmentTree = re.response;
+      });
+    }
   }
-}
+};
 </script>
 <style>
 .el-tabs__nav-scroll {
   margin-left: 120px;
 }
-</style>import { list } from '@/api/role'
+</style>
+import { list } from '@/api/role'

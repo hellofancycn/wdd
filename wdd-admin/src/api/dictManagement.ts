@@ -54,3 +54,12 @@ export function answerEdit(data: any): any {
 export function nextJudge(id: any): any {
   return post(`/api/train/exam/paper/next/judge/${id}`, undefined);
 }
+// 查询字典数据的详细信息
+export function getDictDataInfo(id: any): any {
+  return get(`/api/dict/data/getInfo/${id}`, undefined);
+}
+
+// 查询字典数据的详细信息
+export function getDictDataType(type: any): any {
+  return get(`/api/dict/data/type/${type}`, undefined);
+}
